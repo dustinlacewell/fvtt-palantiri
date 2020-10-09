@@ -100,6 +100,9 @@ Run every task listed before this one.
 **** deploy
 Execute =build= and copy the result to the =deployPath=.
 
+**** watch
+Watch for any changes to the =buildPath= and execute =deploy=.
+
 ** Handlebar Templates
 
 =.html= files located in the =templates= directory in the =buildPath= will
