@@ -131,3 +131,5 @@ The example module comes with some simple mockup functionality:
   cleaner when debugging. It may more useful for someone with mods that depend
   on the same third-party libraries.
 - Need to support the =.hbs= extension for templates.
+- Should probably bring back =create-foundry-project='s actual project generation
+  machinery and make this a proper project template.
