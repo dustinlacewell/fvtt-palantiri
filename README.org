@@ -118,3 +118,16 @@ The example module comes with some simple mockup functionality:
 - module settings for configuring the question and responses
 - a mockup draggable hotbar which opens =ShowDialog=
 - a button added to the scene control which opens =ShowDialog=
+
+
+* Remarks
+- It would be really nice to have livereload or similar integrated so one does
+  not have to manually refresh the browser while the =watch= task is active.
+- There could be more =package.json= based configurability of Gulp, including the
+  paths of various asset types like images, fonts, etc.
+- There is a bit of boilerplate for extracting arbitrary third-party
+  dependencies into a separate bundle, but it is not yet complete. There isn't
+  a ton of benefit to it, but it does save a bit of build time and is a bit
+  cleaner when debugging. It may more useful for someone with mods that depend
+  on the same third-party libraries.
+- Need to support the =.hbs= extension for templates.
