@@ -1,0 +1,58 @@
+ul#mt-hud {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+
+    margin: 0px;
+    padding: 0px;
+    padding-left: 25px;
+
+    background: none;
+
+    & > i {
+        display: none;
+        position: absolute;
+        left: 10px;
+    }
+
+    &:hover > i {
+        display: inline-block;
+    }
+
+    li {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        width: auto;
+        min-width: 42px;
+        height: 42px;
+
+        margin-left: 10px;
+
+        list-style: none;
+        color: white;
+        background: black;
+        border: 1px solid rgba(1, 1, 1, 0.32);
+        border-radius: 5px;
+
+        &.mt-icon-btn {
+            i {
+                margin: 10px;
+                font-size: 2em;
+            }
+        }
+
+        &.mt-label-btn {
+            padding: 0px 10px;
+            font-size: 2.6em;
+            text-transform: uppercase;
+        }
+
+        &:hover {
+            border: 1px solid white;
+        }
+
+    }
+}

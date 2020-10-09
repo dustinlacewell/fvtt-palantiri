@@ -1,0 +1,22 @@
+{
+    "minimumCoreVersion": "0.6.5",
+    "compatibleCoreVersion": "0.6.6",
+    "systems": ["dnd5e"],
+    "scripts": [],
+    "esmodules": ["module.js"],
+    "styles": ["module.css"],
+    "packs": [],
+    "languages": [],
+    "url": "",
+    "manifest": "http://ldlework.ddns.net:8000/dist/module.json",
+    "download": "http://ldlework.ddns.net:8000/package/AmmoSwitcher-v0.0.1.zip",
+    "readme": "",
+    "author": "",
+    "authors": [
+        {
+            "name": "Dustin Lacewell",
+            "email": "dlacewell@gmail.com",
+            "url": "http://ldlework.com"
+        }
+    ]
+}

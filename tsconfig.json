@@ -1,0 +1,41 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "lib": [
+            "dom",
+            "es5",
+            "es6"
+        ],
+
+        "sourceMap": true,
+        "outDir": "dist/",
+
+        "types": [
+            "foundry-pc-types",
+            "jquery"
+        ],
+
+        "experimentalDecorators": true,
+        "allowSyntheticDefaultImports": true,
+        "resolveJsonModule": true,
+        "removeComments": true,
+
+        "baseUrl": ".",
+        "paths": {
+            "@src/*": ["src/ts/*"],
+            "@hooks/*": ["src/ts/hooks/*"],
+
+            "package": ["./package.json"],
+            "utils": ["src/ts/utils"],
+            "templates": ["src/templates/templates.json"]
+        }
+    },
+    "include": [
+        "gulpfile.ts",
+        "gulp/**/*.ts",
+        "src/**/*.ts"
+    ]
+}

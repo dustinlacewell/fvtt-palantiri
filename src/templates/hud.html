@@ -1,0 +1,14 @@
+<ul id="mt-hud">
+  <i id="mt-hud-handle" class="fas fa-dot-circle"></i>
+  {{#each buttons}}
+    {{#if icon}}
+      <li id="{{id}}" class="mt-icon-btn">
+        <i class="fas {{icon}}"></i>
+      </li>
+    {{else}}
+      <li id="{{id}}" class="mt-label-btn">
+        {{label}}
+      </li>
+    {{/if}}
+  {{/each}}
+</ul>
