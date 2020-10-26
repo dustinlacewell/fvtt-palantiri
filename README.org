@@ -58,6 +58,8 @@ port =3000=. Here's a simple example in Node calling =users.all=:
   console.log("Waiting for Palantiri...");
 #+end_src
 
+You can find a slightly more complex example implementing an interactive repl [[https://github.com/dustinlacewell/fvtt-palantiri/blob/master/example.js][here]].
+
 ** Method names
 
 Palantiri offers a wide array of methods for you to call. All method names have
