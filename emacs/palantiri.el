@@ -124,6 +124,7 @@
        (pal-defun ,(pal-intern type "remove") (pid)))))
 
 (defun pal-stop-server ()
+  (interactive)
   (when (and (boundp 'pal-server) pal-server)
     (websocket-server-close pal-server)))
 
