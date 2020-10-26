@@ -9,9 +9,7 @@
 
 =Palantri= is a [[https://en.wikipedia.org/wiki/WebSocket][WebSocket]] [[https://en.wikipedia.org/wiki/JSON-RPC][JSONRPC]] [[https://en.wikipedia.org/wiki/Reverse_proxy][reverse proxy]] for [[https://foundryvtt.com/][Foundry Virtual Tabletop]].
 
-<p align="center">
-  <img width="460" height="300" src="./image.png">
-</p>
+[[./image.png]]
 
 * Huh?
 Palantiri acts as a proxy between Foundry and your software. It allows you to
