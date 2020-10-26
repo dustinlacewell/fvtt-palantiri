@@ -1,5 +1,5 @@
 
-#+TITLE: Palntiri
+#+TITLE: Palantiri
 
 #+begin_src text
   'I took the ball and looked at it,
@@ -7,7 +7,8 @@
                               - Pippin
 #+end_src
 
-=Palantri= is a [[https://en.wikipedia.org/wiki/WebSocket][WebSocket]] [[https://en.wikipedia.org/wiki/JSON-RPC][JSONRPC]] [[https://en.wikipedia.org/wiki/Reverse_proxy][reverse proxy]] for [[https://foundryvtt.com/][Foundry Virtual Tabletop]].
+=Palantri= is a [[https://en.wikipedia.org/wiki/WebSocket][WebSocket]] [[https://en.wikipedia.org/wiki/JSON-RPC][JSONRPC]] [[https://en.wikipedia.org/wiki/Reverse_proxy][reverse proxy]] for [[https://foundryvtt.com/][Foundry Virtual Tabletop]],
+allowing access to data and functionality outside Foundry.
 
 [[./image.png]]
 
@@ -15,26 +16,114 @@
 Palantiri acts as a proxy between Foundry and your software. It allows you to
 access Foundry functionality and data from outside of Foundry.
 
-** WebSockets
 The primary way that browsers communicate with realtime services is WebSockets.
 
-** JSONRPC
-JSONRPC is a way to use JSON for calling functions in remote
-services. By sending JSONRPC requests, your software can call functions in
-Palantiri, accessing functionality and data.
-
-** Reverse Proxy
-Browsers cannot act as WebSocket servers. Only client functionality is
-possible. That means Palantiri cannot listen for incomming connections from
+However, browsers cannot act as WebSocket servers. Only client functionality is
+available. That means Palantiri cannot listen for incomming connections from
 your software.
 
-Instead, you must listen for Palantiri. That means you must be running some
-kind of WebSocket server. Once Palantiri connects to your server, you can send
-it JSONRPC requests.
+Instead, you listen for Palantiri. You must be running some kind of WebSocket
+server. Once Palantiri connects to your server, you can send it JSONRPC
+requests.
 
-* What is the point?
-If you want to control/automate Foundry from scripts, custom clients, Emacs,
+Requests and responses are made using JSONRPC, a way to use JSON for RPC.
+
+If you want to control/automate Foundry from scripts, custom clients, Emacs, or
 whatever, then Palantiri gives you a standard straightforward way to do that.
 
-Check out =fvtt.el= a Foundry integration with Emacs as an example of how
-Palantiri can be used.
+* How to use
+
+Palantiri will automatically connect to any local websocket server running on
+port =3000=. Here's a simple example in Node calling =users.all=:
+
+#+begin_src js
+  const WebSocket = require('ws')
+  const wss = new WebSocket.Server({ port: 3000 })
+
+  wss.on('connection', ws => {
+      // listen for response
+      ws.on('message', msg => {
+          // print and exit
+          console.dir(JSON.parse(msg).result);
+          process.exit();
+      });
+
+      // users.all(["name", "_id"])
+      ws.send(JSON.stringify({
+          id: 0, jsonrpc: "2.0",
+          method: "users.all",
+          params: [["name", "_id"]],
+      }));
+  });
+
+  console.log("Waiting for Palantiri...");
+#+end_src
+
+** Method names
+
+Palantiri offers a wide array of methods for you to call. All method names have
+the following format:
+
+#+begin_src text
+"${namespace}.${name}"
+#+end_src
+
+Namespaces group related methods together and prevent collision between common
+names.
+
+** Request format
+
+Requests should be sent in the JSONRPC 2.0 format. Many programming languages
+have libraries to help you construct and parse the format.
+
+* Method API
+
+Palantiri has a lot of methods for you to call.
+
+** Entity Collections
+The following namespaces contain functions related to Foundry's Entity
+collections:
+
+- actors
+- folders
+- items
+- journal
+- messages
+- playlists
+- scenes
+- tables
+- users
+
+These namespaces all have a common set of methods described below.
+
+
+*** all(keys?: string[]): object[]
+Returns all entities in the collection. Optional =keys= array names the
+properties each returned object should have.
+
+*** one(id: string): object
+Returns the entity with the given =id=.
+
+*** get(id: string, key: string): any
+Returns the value of property =key= of entity with =id=.
+
+*** set(id: string, key: string, val: any)
+Sets the property =key= to value =val= on entity with =id=.
+
+*** getFlag(id: string, scope: string, key: string): any
+Returns the value of flag =key= in =scope= for entity with =id=.
+
+*** setFlag(id: string, scope: string, key: string, val: any)
+Sets the flag =key= in =scope= to =val= for entity with =id=.
+
+*** find(key: string, val: any): object
+Returns the first entity with property =key= having value =val=.
+
+*** filter(key: string, val: any): object[]
+Returns all entities with the property =key= having value =val=.
+
+*** toggle(id: string, key: string)
+Toggles the boolean property =key= on entity with =id=.
+
+*** remove(id: string)
+Deletes the entity with =id=.
