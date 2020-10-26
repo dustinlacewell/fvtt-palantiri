@@ -163,9 +163,10 @@
 ** public
 *** stop-server
 #+begin_src emacs-lisp
-(defun pal-stop-server ()
-  (when (and (boundp 'pal-server) pal-server)
-    (websocket-server-close pal-server)))
+  (defun pal-stop-server ()
+    (interactive)
+    (when (and (boundp 'pal-server) pal-server)
+      (websocket-server-close pal-server)))
 #+end_src
 *** start-server
 #+begin_src emacs-lisp
