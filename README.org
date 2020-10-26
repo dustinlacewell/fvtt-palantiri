@@ -2,9 +2,8 @@
 #+TITLE: Palantiri
 
 #+begin_src text
-  'I took the ball and looked at it,
-  and I saw things that frightened me.'
-                              - Pippin
+  'I took the ball and looked at it, and I saw things that frightened me.'
+                                                                 - Pippin
 #+end_src
 
 =Palantri= is a [[https://en.wikipedia.org/wiki/WebSocket][WebSocket]] [[https://en.wikipedia.org/wiki/JSON-RPC][JSONRPC]] [[https://en.wikipedia.org/wiki/Reverse_proxy][reverse proxy]] for [[https://foundryvtt.com/][Foundry Virtual Tabletop]],
