@@ -1,135 +1,40 @@
 
-#+TITLE: ModuleTemplate
+#+TITLE: Palntiri
 
-This is a TypeScript template for Foundry VTT modules/systems.
-
-It's based off [[https://gitlab.com/foundry-projects/foundry-pc/create-foundry-project][create-foundry-project]] with a bit of code from [[https://github.com/espositos/fvtt-tokenactionhud/][fvtt-tokenactionhud]].
-
-/Actual project generation features are missing, it's more of an example repo for now./
-
-* Getting Started
-
-Clone the repository then use yarn to install packages:
-
-#+begin_src sh
-  $ git clone http://github.com/dustinlacewell/ModuleTemplate/
-  $ cd ModuleTemplate
-  $ yarn install
+#+begin_src text
+  'I took the ball and looked at it,
+  and I saw things that frightened me.'
+                              - Pippin
 #+end_src
 
-* Overview
+=Palantri= is a [[https://en.wikipedia.org/wiki/WebSocket][WebSocket]] [[https://en.wikipedia.org/wiki/JSON-RPC][JSONRPC]] [[https://en.wikipedia.org/wiki/Reverse_proxy][reverse proxy]] for [[https://foundryvtt.com/][Foundry Virtual Tabletop]].
 
-The example module implements a very simple hotbar mockup.
+[[./image.png]]
 
-The main value of =ModuleTemplate= are the bits involved with building the
-module.
+* Huh?
+Palantiri acts as a proxy between Foundry and your software. It allows you to
+access Foundry functionality and data from outside of Foundry.
 
-** module.json
+** WebSockets
+The primary way that browsers communicate with realtime services is WebSockets.
 
-The =module.json= module manifest is missing some properties. That's because they
-will automatically be pulled from =package.json= so they do not need to be
-specified twice:
+** JSONRPC
+JSONRPC is a way to use JSON for calling functions in remote
+services. By sending JSONRPC requests, your software can call functions in
+Palantiri, accessing functionality and data.
 
-- name
-- version
-- description
+** Reverse Proxy
+Browsers cannot act as WebSocket servers. Only client functionality is
+possible. That means Palantiri cannot listen for incomming connections from
+your software.
 
-  /You can still provide these in =module.json= if you want./
+Instead, you must listen for Palantiri. That means you must be running some
+kind of WebSocket server. Once Palantiri connects to your server, you can send
+it JSONRPC requests.
 
-** Gulp
+* What is the point?
+If you want to control/automate Foundry from scripts, custom clients, Emacs,
+whatever, then Palantiri gives you a standard straightforward way to do that.
 
-=ModuleTemplate= is using [[https://gulpjs.com/][Gulp]] for:
-
-- Transpiling TypeScript to Javascript
-- Transpiling SCSS to CSS
-- Automatically registering handlebar templates
-- Copying other assets into the build
-- Creating release archives
-- Copying the build somewhere (like an SSHFS mount to your Foundry server)
-
-
-*** package.json
-
-The =package.json= file contains a ="gulp"= section which contains various build
-related settings:
-
-**** sourcePath
-The root directory where build inputs are located.
-
-**** buildPath
-The directory where the module package will be put.
-
-**** entrypoint
-The =.ts= entrypoint of your module.
-
-**** deployPath
-Where the =deploy= task should copy the module to.
-
-**** standalone (default: mt)
-The variable name of your module in the browser.
-
-**** debug (default: false)
-Produce sourcemaps when =true=, and minimize when =false=.
-
-**** vendors (default: [])
-Third-party packages to exclude from the module bundle.
-
-*** commands
-
-Gulp maybe be invoked via `npx gulp $TASKNAME`. With no taskname, all tasks
-will be executed, including =deploy=.
-
-**** clean
-Delete the =buildPath=.
-
-**** code
-Transpile the TypeScript to Javascript.
-
-**** static
-Copy all static assets.
-
-**** manifest
-Render the =module.json= manifest.
-
-**** templates
-Aggregate handlebar templates into =templates/templates.json=.
-
-**** build
-Run every task listed before this one.
-
-**** deploy
-Execute =build= and copy the result to the =deployPath=.
-
-**** watch
-Watch for any changes to the =buildPath= and execute =deploy=.
-
-** Handlebar Templates
-
-=.html= files located in the =templates= directory in the =buildPath= will
-automatically be collected into a =templates.json= file in the same directory.
-
-This file is then used to register the templates with Foundry automatically.
-
-* Example Module Contents
-
-The example module comes with some simple mockup functionality:
-
-- a simple Application =ShowDialog= which asks a yes/no question
-- module settings for configuring the question and responses
-- a mockup draggable hotbar which opens =ShowDialog=
-- a button added to the scene control which opens =ShowDialog=
-
-
-* Remarks
-- It would be really nice to have livereload or similar integrated so one does
-  not have to manually refresh the browser while the =watch= task is active.
-- There could be more =package.json= based configurability of Gulp, including the
-  paths of various asset types like images, fonts, etc.
-- There is a bit of boilerplate for extracting arbitrary third-party
-  dependencies into a separate bundle, but it is not yet complete. There isn't
-  a ton of benefit to it, but it does save a bit of build time and is a bit
-  cleaner when debugging. It may more useful for someone with mods that depend
-  on the same third-party libraries.
-- Need to support the =.hbs= extension for templates.
-- Should probably bring back =create-foundry-project='s actual project generation
-  machinery and make this a proper project template.
+Check out =fvtt.el= a Foundry integration with Emacs as an example of how
+Palantiri can be used.

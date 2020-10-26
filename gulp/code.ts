@@ -5,6 +5,7 @@ import { bundle, task } from "./lib";
 
 const { entrypoint, sourcePath, buildPath, standalone, debug } = settings;
 
+
 const defaultTask = task("code", () =>
     bundle({
         src: path.join(sourcePath, entrypoint),

@@ -8,8 +8,7 @@
     "packs": [],
     "languages": [],
     "url": "",
-    "manifest": "http://ldlework.ddns.net:8000/dist/module.json",
-    "download": "http://ldlework.ddns.net:8000/package/AmmoSwitcher-v0.0.1.zip",
+    "manifest": "https://raw.githubusercontent.com/dustinlacewell/fvtt-palantiri/master/dist/module.json",
     "readme": "",
     "author": "",
     "authors": [

@@ -1,20 +1,20 @@
 export default function registerSettings() {
-    game.settings.register("ModuleTemplate", "YesNoQuestion", {
-        name: "ModuleTemplate.YesNoQuestion.Text",
+    game.settings.register("Palantiri", "YesNoQuestion", {
+        name: "Palantiri.YesNoQuestion.Text",
         scope: "client",
         config: true,
         type: String,
         default: "Choose wisely!",
     });
-    game.settings.register("ModuleTemplate", "YesResult", {
-        name: "ModuleTemplate.YesResult.Text",
+    game.settings.register("Palantiri", "YesResult", {
+        name: "Palantiri.YesResult.Text",
         scope: "client",
         config: true,
         type: String,
         default: "You chose... poorly",
     });
-    game.settings.register("ModuleTemplate", "NoResult", {
-        name: "ModuleTemplate.NoResult.Text",
+    game.settings.register("Palantiri", "NoResult", {
+        name: "Palantiri.NoResult.Text",
         scope: "client",
         config: true,
         type: String,

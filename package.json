@@ -1,8 +1,8 @@
 {
     "private": true,
-    "name": "ModuleTemplate",
+    "name": "Palantiri",
     "version": "0.1.0",
-    "description": "A module template for Foundry VTT",
+    "description": "A websocket-client proxy for Foundry VTT",
     "scripts": {
         "update": "yarn upgrade foundry-pc-types"
     },
@@ -11,7 +11,7 @@
         "buildPath": "dist",
         "entrypoint": "ts/index.ts",
         "deployPath": "/media/foundry/Data/modules/",
-        "standalone": "mt",
+        "standalone": "fvtt",
         "debug": true,
         "vendors": []
     },
@@ -33,9 +33,11 @@
         "@types/gulp-sourcemaps": "0.0.32",
         "@types/gulp-terser": "^1.2.1",
         "@types/gulp-util": "^3.0.35",
+        "@types/handlebars-helpers": "^0.5.2",
         "@types/jquery": "^3.5.2",
         "@types/ncp": "^2.0.4",
         "@types/node": "^14.11.7",
+        "@types/socket.io": "^2.1.11",
         "@types/vinyl-buffer": "^1.0.0",
         "@types/vinyl-source-stream": "0.0.30",
         "@types/yargs": "^15.0.8",
@@ -43,6 +45,7 @@
         "babel-plugin-module-resolver": "^4.0.0",
         "babel-preset-proposal-typescript": "^1.5.0",
         "babelify": "^10.0.0",
+        "biwascheme": "^0.7.0",
         "browserify": "^16.5.2",
         "browserify-css": "^0.15.0",
         "chalk": "^4.1.0",
@@ -69,5 +72,13 @@
         "vinyl-buffer": "^1.0.1",
         "vinyl-source-stream": "^2.0.0",
         "yargs": "^16.0.3"
+    },
+    "dependencies": {
+        "@handlebars/allow-prototype-access": "^1.0.3",
+        "handlebars-helpers": "^0.10.0",
+        "jscl": "^0.7.0",
+        "jsonrpc-lite": "^2.2.0",
+        "nested-property": "^4.0.0",
+        "socket.io": "^2.3.0"
     }
 }

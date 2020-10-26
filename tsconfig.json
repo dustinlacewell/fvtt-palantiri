@@ -7,7 +7,8 @@
         "lib": [
             "dom",
             "es5",
-            "es6"
+            "es6",
+            "esnext"
         ],
 
         "sourceMap": true,
@@ -26,7 +27,7 @@
         "baseUrl": ".",
         "paths": {
             "@src/*": ["src/ts/*"],
-            "@hooks/*": ["src/ts/hooks/*"],
+            "@rpc/*": ["src/ts/rpc/*"],
 
             "package": ["./package.json"],
             "utils": ["src/ts/utils"],

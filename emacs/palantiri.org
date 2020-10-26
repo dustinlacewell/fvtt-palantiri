@@ -1,0 +1,267 @@
+#+title: palantiri.el
+#+PROPERTY: header-args :tangle yes
+
+* preamble
+#+begin_src emacs-lisp
+  ;;; palantiri.el --- Helpful olp functions
+
+  ;; Author: Dustin Lacewell <dlacewell@gmail.com>
+  ;; Version: 0.1.0
+  ;; Keywords: org-mode olp
+  ;; Package-Requires: ((emacs "24") (ht "0") (uuidgen "0") (websocket "0") (aio "0"))
+  ;; This is free and unencumbered software released into the public domain.
+
+  ;; Anyone is free to copy, modify, publish, use, compile, sell, or
+  ;; distribute this software, either in source code form or as a compiled
+  ;; binary, for any purpose, commercial or non-commercial, and by any
+  ;; means.
+
+  ;; In jurisdictions that recognize copyright laws, the author or authors
+  ;; of this software dedicate any and all copyright interest in the
+  ;; software to the public domain. We make this dedication for the benefit
+  ;; of the public at large and to the detriment of our heirs and
+  ;; successors. We intend this dedication to be an overt act of
+  ;; relinquishment in perpetuity of all present and future rights to this
+  ;; software under copyright law.
+
+  ;; THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+  ;; EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+  ;; MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+  ;; IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+  ;; OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+  ;; ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+  ;; OTHER DEALINGS IN THE SOFTWARE.
+
+  ;; For more information, please refer to <http://unlicense.org>
+
+  ;;; Commentary:
+
+  ;; Helpful olp commands
+  ;;
+  ;; See documentation at https://github.com/dustinlacewell/fvtt.el
+
+  ;;; Code:
+  (use-package aio)
+  (use-package ht)
+  (use-package uuidgen)
+  (use-package websocket)
+
+  (require 'aio)
+  (require 'ht)
+  (require 'uuidgen)
+  (require 'websocket)
+#+end_src
+* utils
+** get
+#+begin_src emacs-lisp
+  (defun pal-get (key val)
+    (let ((val (car (alist-get key val))))
+      (case val
+        ((eq :json-false) nil)
+        ((eq :json-null) nil)
+        (t val))))
+#+end_src
+
+* server
+** state
+*** server
+#+begin_src emacs-lisp
+(defvar pal-server nil)
+#+end_src
+*** socket
+#+begin_src emacs-lisp
+(defvar pal-socket nil)
+#+end_src
+*** callbacks
+#+begin_src emacs-lisp
+(defvar pal-callbacks nil)
+#+end_src
+** private
+*** parse-frame
+#+begin_src emacs-lisp
+  (defun pal--parse-frame (frame)
+    (-let* ((json-string (concat pal--buffer (websocket-frame-text frame)))
+            (_ (setq pal--buffer ""))
+            (_ (message "%s" json-string))
+            (data (condition-case nil
+                      (json-read-from-string json-string)
+                    (error (setq pal--buffer json-string))))
+            (id (alist-get 'id data))
+            (result (alist-get 'result data)))
+      (when (string-equal "" pal--buffer)
+        (list id result))))
+#+end_src
+
+*** on-open
+#+begin_src emacs-lisp
+  (defun pal--on-open (ws)
+    (setq pal-socket ws)
+    (message "Palantiri Connected."))
+#+end_src
+
+*** on-close
+#+begin_src emacs-lisp
+  (defun pal--on-close (ws)
+    (setq pal-socket nil)
+    (message "Palantiri Disconnected."))
+#+end_src
+
+*** on-message
+#+begin_src emacs-lisp
+  (setq pal--buffer "")
+
+  (defun pal--on-message (ws frame)
+    (-let (((uuid data) (pal--parse-frame frame)))
+      (if uuid
+          (progn
+            (setq pal--buffer "")
+            (let ((promise (ht-get pal-callbacks uuid nil)))
+              (when promise
+                (aio-resolve promise `(lambda () ',data))
+                (ht-remove pal-callbacks uuid)))))))
+#+end_src
+
+*** raw
+#+begin_src emacs-lisp
+  (defmacro pal-raw (method params)
+    (declare (indent defun))
+    `(progn
+       (let* ((id (uuidgen-4))
+              (promise (aio-promise))
+              (payload (list "jsonrpc" "2.0" "id" id "method" ,method "params" ,params))
+              (json (json-encode-plist payload)))
+         (ht-set pal-callbacks id promise)
+         (websocket-send-text pal-socket json)
+         promise)))
+#+end_src
+*** raw!
+#+begin_src emacs-lisp
+  (defmacro pal-raw! (method params)
+    `(aio-wait-for (pal-raw ,method ,params)))
+#+end_src
+*** deftype
+#+begin_src emacs-lisp
+  (defun pal-intern (ns method)
+    (intern (format "%s-%s" ns method)))
+
+  (defmacro pal-deftype (type)
+    (let ((sym ))
+      `(progn
+         (pal-defun ,(pal-intern type "all") (&optional keys))
+         (pal-defun ,(pal-intern type "one") (pid))
+         (pal-defun ,(pal-intern type "get") (pid key))
+         (pal-defun ,(pal-intern type "set") (pid key val))
+         (pal-defun ,(pal-intern type "getFlag") (pid scope key))
+         (pal-defun ,(pal-intern type "setFlag") (pid scope key val))
+         (pal-defun ,(pal-intern type "find") (key val))
+         (pal-defun ,(pal-intern type "filter") (key val))
+         (pal-defun ,(pal-intern type "toggle") (pid key))
+         (pal-defun ,(pal-intern type "create") (name))
+         (pal-defun ,(pal-intern type "remove") (pid)))))
+
+#+end_src
+** public
+*** stop-server
+#+begin_src emacs-lisp
+(defun pal-stop-server ()
+  (when (and (boundp 'pal-server) pal-server)
+    (websocket-server-close pal-server)))
+#+end_src
+*** start-server
+#+begin_src emacs-lisp
+  (defun pal-start-server ()
+    (interactive)
+    (pal-stop-server)
+    (setq pal-callbacks (ht-create))
+    (setq pal-server (websocket-server 3000
+                                        :host 'local
+                                        :on-open 'pal--on-open
+                                        :on-message 'pal--on-message
+                                        :on-close 'pal--on-close)))
+#+end_src
+*** rpc
+#+begin_src emacs-lisp
+  (defun pal-rpc (ns method params)
+    (let ((method (format "%s.%s" ns method))
+          (params (seq-into params 'vector)))
+      (eval `(pal-raw! ',method ',params))))
+#+end_src
+*** defun
+#+begin_src emacs-lisp
+  (defmacro pal-defun (name &optional args)
+    (-let* (((ns method) (s-split "-" (symbol-name name)))
+            (fun-name (intern (format "pal-%s-%s" ns method)))
+            (filtered-args (--filter (not (s-starts-with? "&" (symbol-name it))) args)))
+      `(defun ,fun-name ,args
+         (pal-rpc ,ns ,method ,`(vector ,@filtered-args)))))
+#+end_src
+* actors
+** standard functions
+#+begin_src emacs-lisp
+  (pal-deftype actors)
+#+end_src
+* folders
+** standard functions
+#+begin_src emacs-lisp
+  (pal-deftype folders)
+#+end_src
+* items
+** standard functions
+#+begin_src emacs-lisp
+  (pal-deftype items)
+#+end_src
+* journal
+** standard functions
+#+begin_src emacs-lisp
+  (pal-deftype journal)
+#+end_src
+* messages
+** standard functions
+#+begin_src emacs-lisp
+  (pal-deftype messages)
+#+end_src
+* playlists
+** standard functions
+#+begin_src emacs-lisp
+  (pal-deftype playlists)
+#+end_src
+* scenes
+** standard functions
+#+begin_src emacs-lisp
+  (pal-deftype scenes)
+#+end_src
+* tables
+** standard functions
+#+begin_src emacs-lisp
+  (pal-deftype tables)
+#+end_src
+* users
+** standard functions
+#+begin_src emacs-lisp
+  (pal-deftype u)
+#+end_src
+* tests
+#+begin_src emacs-lisp :tangle no
+  (and t)
+
+  (pal-raw! 5)
+
+  (pal-rpc "echo" 5 "biz" '(a b c))
+
+  (let* ((pl (pal-pl-find "name" "Nightstone"))
+         (id (alist-get '_id pl)))
+    (pal-rpc "pl.set" id "name" "Nightstone"))
+
+  (let* ((pl (pal-rpc "pl.find" "name" "Nightstone"))
+         (id (alist-get '_id pl)))
+    (pal-rpc "pl.toggle" id "repeat"))
+
+  (let* ((pid (alist-get '_id (pal-pl-find "name" "Nightstone")))
+         (sid (alist-get '_id (pal- "snd.find" pid "name" "church-bells"))))
+    (pal-rpc "snd.toggle" pid sid "repeat"))
+
+#+end_src
+* provides
+#+begin_src emacs-lisp
+  (provide 'palantiri)
+#+end_src
